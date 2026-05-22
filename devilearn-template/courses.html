@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Devilearn</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="./css/styles.css" />
+</head>
+
+<body>
+    <div class="layout">
+
+        <div class="sidebar">
+            <div class="logo">
+                <img src="./images/devilearn.png" alt="Logo">
+            </div>
+            <ul class="menu">
+                <li><a class="menu-option" href="index.html"><i
+                            class="fa-solid fa-house icon"></i><span>Dashboard</span></a>
+                </li>
+                <li><a class="menu-option" href="courses.html"><i
+                            class="fa-solid fa-chalkboard-user icon"></i><span>Cursos</span></a></li>
+
+
+            </ul>
+            <ul class="bottom-menu">
+                <li><a class="menu-option" href="#"><i class="fa-solid fa-question icon"></i><span>Soporte</span></a>
+                </li>
+                <li><a class="menu-option" href="#"><i class="fa-solid fa-gear icon"></i><span>Configuración</span></a>
+                </li>
+            </ul>
+        </div>
+
+
+        <!-- Main content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass icon"></i>
+                    <input type="text" placeholder="Buscar..." />
+                </div>
+                <div class="header-right">
+                    <div class="avatar">
+                        <img src="https://randomuser.me/api/portraits/men/42.jpg" alt="User" />
+                    </div>
+                </div>
+            </div>
+            <!-- Aquí va el contenido de la página -->
+            <main>
+                <!-- === COURSE CARDS === -->
+
+                <div class="carousel-wrapper">
+                    <div class="course-grid">
+                        <div class="course-grid">
+                            <!-- Card 1 -->
+                            <div class="course-card">
+                                <a href="course_detail.html">
+                                    <img src="./images/curso_1.jpg" alt="Course Image" class="course-img" />
+                                    <div class="course-info">
+                                        <div class="course-rating">
+                                            <span class="tag beginner">Beginner</span>
+                                            <div class="course-meta">
+                                                <span><i class="fa-solid fa-star"></i> 5.0</span>
+                                            </div>
+                                        </div>
+
+                                        <h3 class="course-title">Three-month Course to Learn the Basics of Python and
+                                            Start
+                                            Coding.
+                                        </h3>
+                                        <div class="author"><img src="https://randomuser.me/api/portraits/women/68.jpg"
+                                                alt=""><span>Alison Walsh</span></div>
+                                    </div>
+
+                                </a>
+                            </div>
+
+                            <!-- Card 2 -->
+                            <div class="course-card">
+                                <a href="course_detail.html">
+                                    <img src="./images/curso_2.jpg" alt="Course Image" class="course-img" />
+                                    <div class="course-info">
+                                        <div class="course-rating">
+                                            <span class="tag beginner">Beginner</span>
+                                            <div class="course-meta">
+                                                <span><i class="fa-solid fa-star"></i> 5.0</span>
+                                            </div>
+                                        </div>
+                                        <h3 class="course-title">Beginner's Guide to Successful Company Management:
+                                            Business
+                                            And
+                                            More</h3>
+                                        <div class="author"><img src="https://randomuser.me/api/portraits/women/20.jpg"
+                                                alt=""><span>Patty Kutch</span></div>
+                                    </div>
+
+                                </a>
+                            </div>
+
+                            <!-- Card 3 -->
+                            <div class="course-card">
+                                <a href="course_detail.html">
+                                    <img src="./images/curso_3.jpg" alt="Course Image" class="course-img" />
+                                    <div class="course-info">
+                                        <div class="course-rating">
+                                            <span class="tag beginner">Beginner</span>
+                                            <div class="course-meta">
+                                                <span><i class="fa-solid fa-star"></i> 5.0</span>
+                                            </div>
+                                        </div>
+                                        <h3 class="course-title">A Fascinating Theory of Probability. Practice.
+                                            Application.
+                                            How to
+                                            Outplay...</h3>
+                                        <div class="author"><img src="https://randomuser.me/api/portraits/men/32.jpg"
+                                                alt=""><span>Alonzo Murray</span></div>
+
+
+                                    </div>
+
+                                </a>
+                            </div>
+
+                            <!-- Card 4 -->
+                            <div class="course-card">
+                                <a href="course_detail.html">
+                                    <img src="./images/curso_4.jpg" alt="Course Image" class="course-img" />
+                                    <div class="course-info">
+                                        <div class="course-rating">
+                                            <span class="tag beginner">Beginner</span>
+                                            <div class="course-meta">
+                                                <span><i class="fa-solid fa-star"></i> 5.0</span>
+                                            </div>
+                                        </div>
+                                        <h3 class="course-title">Introduction: Machine Learning and LLM. Implementation
+                                            in
+                                            Modern
+                                            Software</h3>
+                                        <div class="author"><img src="https://randomuser.me/api/portraits/men/45.jpg"
+                                                alt=""><span>Gregory Harris</span></div>
+                                    </div>
+
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+    <script src="./js/script.js"></script>
+
+</body>
+
+</html>

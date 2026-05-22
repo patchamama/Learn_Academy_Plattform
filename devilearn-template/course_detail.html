@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Devilearn</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="./css/styles.css" />
+</head>
+
+<body>
+    <div class="layout">
+
+        <div class="sidebar">
+            <div class="logo">
+                <img src="./images/devilearn.png" alt="Logo">
+            </div>
+            <ul class="menu">
+                <li><a class="menu-option" href="index.html"><i
+                            class="fa-solid fa-house icon"></i><span>Dashboard</span></a>
+                </li>
+                <li><a class="menu-option" href="courses.html"><i
+                            class="fa-solid fa-chalkboard-user icon"></i><span>Cursos</span></a></li>
+
+
+            </ul>
+            <ul class="bottom-menu">
+                <li><a class="menu-option" href="#"><i class="fa-solid fa-question icon"></i><span>Soporte</span></a>
+                </li>
+                <li><a class="menu-option" href="#"><i class="fa-solid fa-gear icon"></i><span>Configuración</span></a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass icon"></i>
+                    <input type="text" placeholder="Buscar..." />
+                </div>
+                <div class="header-right">
+                    <div class="avatar">
+                        <img src="https://randomuser.me/api/portraits/men/42.jpg" alt="User" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aquí va el contenido de la página -->
+            <main>
+                <!-- === COURSE OVERVIEW === -->
+                <div class="course-layout">
+                    <!-- Accordion del curso -->
+                    <div class="course-sections">
+                        <h2>Contenido del curso</h2>
+                        <div class="accordion">
+                            <div class="accordion-item">
+                                <button class="accordion-header">Sección 1: Introducción al curso</button>
+                                <div class="accordion-content">
+                                    <ul>
+                                        <li><i class="fa-solid fa-video"></i>¿Qué aprenderás en este curso?</li>
+                                        <li><i class="fa-solid fa-file"></i>Cómo usar la plataforma</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <button class="accordion-header">Sección 2: Fundamentos necesarios de Python</button>
+                                <div class="accordion-content">
+                                    <ul>
+                                        <li>Variables y tipos de datos</li>
+                                        <li>Condicionales y bucles</li>
+                                        <li>Funciones básicas</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <button class="accordion-header">Sección 3: Introducción a Django</button>
+                                <div class="accordion-content">
+                                    <ul>
+                                        <li>¿Qué es Django?</li>
+                                        <li>Primer proyecto con Django</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- Agrega más secciones similares -->
+                        </div>
+                    </div>
+
+                    <!-- Card lateral -->
+                    <div class="course-info-card">
+                        <div class="card-banner">
+                            <div class="tag">{devilearn}</div>
+                            <img src="https://placehold.co/600x200/1e1e1e/ffffff?text=django" alt="Curso Django" />
+                            <img class="author-avatar" src="https://randomuser.me/api/portraits/men/15.jpg" alt="Autor">
+                        </div>
+                        <div class="card-body">
+                            <h3>Acerca de este curso</h3>
+                            <ul class="course-details">
+                                <li><i class="fa-solid fa-file"></i> 79 lecciones</li>
+                                <li><i class="fa-solid fa-video"></i> 8 horas de contenido en video</li>
+                                <li><i class="fa-solid fa-graduation-cap"></i> Ricardo Cuéllar</li>
+                            </ul>
+                            <a class="btn bnt-primary btn-course" href="course_lessons.html">Continuar aprendiendo</a>
+
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="./js/script.js"></script>
+
+</body>
+
+</html>
