@@ -1,0 +1,4 @@
+title: Welcome to the Course
+description: Introduction lesson covering the core concepts.
+layout: default
+show_attachments: true
