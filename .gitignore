@@ -1,0 +1,25 @@
+# OS/editor noise
+.DS_Store
+Thumbs.db
+
+# Dependencies
+/vendor/
+
+# Local runtime/config
+app/config.local.php
+database/*.sqlite
+database/*.sqlite-*
+.env
+
+# Generated course output
+/test-output/
+/dist/
+/build/
+
+# Agent/generated local metadata
+.atl/.skill-registry.cache.json
+
+# Local agent workspace
+.atl/
+.agents/
+.codex/

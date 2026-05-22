@@ -1,0 +1,30 @@
+{
+    "name": "learn-academy/platform",
+    "description": "Course generation platform from numbered content directories",
+    "type": "project",
+    "require": {
+        "php": ">=8.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "LearnAcademy\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LearnAcademy\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit --testdox"
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}
