@@ -3,6 +3,7 @@
 namespace LearnAcademy\App\Controllers;
 
 use LearnAcademy\App\App;
+use LearnAcademy\Generator\MarkdownRenderer;
 
 class LessonController
 {
@@ -129,16 +130,35 @@ class LessonController
         }
         unset($section);
 
+        // Render markdown/text content server-side
+        $renderedContent = '';
+        if ($mainContent && in_array($mainContent['file_type'], ['markdown', 'text'], true)) {
+            if (is_file($mainContent['path'])) {
+                $raw      = file_get_contents($mainContent['path']);
+                $renderer = new MarkdownRenderer($images);
+                $renderedContent = $renderer->render($raw);
+            }
+        } elseif ($mainContent && $mainContent['file_type'] === 'html') {
+            $renderedContent = is_file($mainContent['path'])
+                ? file_get_contents($mainContent['path'])
+                : '';
+        }
+
+        // Build media URL helper — files served through /media/{slug}/{filename}
+        $mediaUrl = fn(array $f) => '/media/' . rawurlencode($course['slug']) . '/' . rawurlencode($f['filename']);
+
         $this->app->view->layout('lesson/show', [
-            'course'      => $course,
-            'lesson'      => $lesson,
-            'mainContent' => $mainContent,
-            'attachments' => $attachments,
-            'images'      => $images,
-            'subtitles'   => $subtitles,
-            'prevLesson'  => $prevLesson,
-            'nextLesson'  => $nextLesson,
-            'sections'    => $sections,
+            'course'          => $course,
+            'lesson'          => $lesson,
+            'mainContent'     => $mainContent,
+            'renderedContent' => $renderedContent,
+            'attachments'     => $attachments,
+            'images'          => $images,
+            'subtitles'       => $subtitles,
+            'prevLesson'      => $prevLesson,
+            'nextLesson'      => $nextLesson,
+            'sections'        => $sections,
+            'mediaUrl'        => $mediaUrl,
         ], 'layouts/lesson');
     }
 }

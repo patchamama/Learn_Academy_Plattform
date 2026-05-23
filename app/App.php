@@ -167,8 +167,23 @@ class App
         $this->router->post('/admin/users/:id/access', fn($p) =>
             (new Controllers\AdminController($app))->grantAccess((int)$p['id'])
         );
+        $this->router->post('/admin/users/:id/revoke', fn($p) =>
+            (new Controllers\AdminController($app))->revokeAccess((int)$p['id'])
+        );
+        $this->router->get('/admin/moderation', fn() =>
+            (new Controllers\AdminController($app))->moderation()
+        );
         $this->router->post('/admin/comments/:id/moderate', fn($p) =>
             (new Controllers\AdminController($app))->moderateComment((int)$p['id'])
+        );
+        $this->router->get('/admin/courses', fn() =>
+            (new Controllers\AdminController($app))->courses()
+        );
+        $this->router->post('/admin/courses/import', fn() =>
+            (new Controllers\AdminController($app))->importCourse()
+        );
+        $this->router->post('/admin/courses/:id/delete', fn($p) =>
+            (new Controllers\AdminController($app))->deleteCourse((int)$p['id'])
         );
 
         // ── Payments ─────────────────────────────────────────────────────
@@ -178,11 +193,25 @@ class App
         $this->router->post('/purchase/:courseSlug/stripe', fn($p) =>
             (new Controllers\PaymentController($app))->stripeCheckout($p['courseSlug'])
         );
+        $this->router->get('/purchase/:courseSlug/success', fn($p) =>
+            (new Controllers\PaymentController($app))->stripeSuccess($p['courseSlug'])
+        );
+        $this->router->post('/purchase/:courseSlug/paypal/create', fn($p) =>
+            (new Controllers\PaymentController($app))->paypalCreateOrder($p['courseSlug'])
+        );
+        $this->router->post('/purchase/:courseSlug/paypal/capture', fn($p) =>
+            (new Controllers\PaymentController($app))->paypalCaptureOrder($p['courseSlug'])
+        );
         $this->router->post('/api/webhooks/stripe', fn() =>
             (new Controllers\PaymentController($app))->stripeWebhook()
         );
         $this->router->post('/api/webhooks/paypal', fn() =>
             (new Controllers\PaymentController($app))->paypalWebhook()
+        );
+
+        // ── Media files (served from source_dir) ────────────────────────
+        $this->router->get('/media/:courseSlug/:filename', fn($p) =>
+            (new Controllers\MediaController($app))->serve($p['courseSlug'], $p['filename'])
         );
 
         // ── Language switch ───────────────────────────────────────────────

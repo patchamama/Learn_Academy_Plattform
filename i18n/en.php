@@ -81,6 +81,7 @@ return [
     'dashboard.expires'   => 'Access expires: :date',
 
     // Admin
+    'admin.courses'       => 'Courses',
     'admin.users'         => 'Users',
     'admin.grant_access'  => 'Grant access',
     'admin.revoke_access' => 'Revoke access',

@@ -84,16 +84,17 @@ class Database
         if (!file_exists($schemaFile)) return;
 
         $sql = file_get_contents($schemaFile);
-        // Execute each statement (split on ; followed by newline)
-        $statements = preg_split('/;\s*\n/', $sql);
+        // Strip single-line comments, then split on semicolons
+        $sql = preg_replace('/^\s*--[^\n]*$/m', '', $sql);
+        $statements = array_filter(
+            array_map('trim', explode(';', $sql)),
+            fn($s) => $s !== ''
+        );
         foreach ($statements as $stmt) {
-            $stmt = trim($stmt);
-            if ($stmt !== '' && !str_starts_with($stmt, '--')) {
-                try {
-                    $this->pdo->exec($stmt);
-                } catch (\PDOException) {
-                    // Ignore "already exists" errors during migration
-                }
+            try {
+                $this->pdo->exec($stmt);
+            } catch (\PDOException) {
+                // Ignore "already exists" — idempotent migrations
             }
         }
     }
