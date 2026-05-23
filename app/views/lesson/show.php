@@ -2,14 +2,26 @@
 /** @var array      $course */
 /** @var array      $lesson */
 /** @var array|null $mainContent */
+/** @var string     $renderedContent */
 /** @var array      $attachments */
 /** @var array      $images */
 /** @var array      $subtitles */
 /** @var array|null $prevLesson */
 /** @var array|null $nextLesson */
+/** @var callable   $mediaUrl */
 
-$config = json_decode($lesson['config_json'] ?? '{}', true);
-$layout = $config['layout'] ?? 'default';
+$lessonConfig = json_decode($lesson['config_json'] ?? '{}', true);
+$attIcon = function(string $filename): string {
+    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    return match($ext) {
+        'pdf'         => 'fa-file-pdf',
+        'docx', 'doc' => 'fa-file-word',
+        'zip', 'rar'  => 'fa-file-zipper',
+        'xlsx'        => 'fa-file-excel',
+        'pptx'        => 'fa-file-powerpoint',
+        default       => 'fa-file',
+    };
+};
 ?>
 <div class="content-header">
     <h1><?= e($lesson['title']) ?></h1>
@@ -22,9 +34,9 @@ $layout = $config['layout'] ?? 'default';
     <div class="video-wrapper">
         <video class="lesson-video" controls preload="metadata"
                data-lesson-id="<?= (int)$lesson['id'] ?>">
-            <source src="<?= e($mainContent['path']) ?>">
+            <source src="<?= e($mediaUrl($mainContent)) ?>">
             <?php foreach ($subtitles as $sub): ?>
-            <track kind="subtitles" src="<?= e($sub['path']) ?>" label="Subtitles">
+            <track kind="subtitles" src="<?= e($mediaUrl($sub)) ?>" label="Subtitles">
             <?php endforeach; ?>
             Your browser does not support the video element.
         </video>
@@ -51,52 +63,34 @@ $layout = $config['layout'] ?? 'default';
     <!-- Audio player -->
     <div class="audio-wrapper">
         <audio controls class="lesson-audio">
-            <source src="<?= e($mainContent['path']) ?>">
+            <source src="<?= e($mediaUrl($mainContent)) ?>">
         </audio>
     </div>
 
     <?php elseif ($mainContent && in_array($mainContent['file_type'], ['text', 'html', 'markdown'], true)): ?>
-    <!-- Text content -->
-    <div class="text-content">
-        <?php if ($mainContent['file_type'] === 'html'): ?>
-        <?= file_exists($mainContent['path']) ? file_get_contents($mainContent['path']) : '' ?>
-        <?php elseif ($mainContent['file_type'] === 'markdown'): ?>
-        <pre style="white-space:pre-wrap"><?= e(file_exists($mainContent['path']) ? file_get_contents($mainContent['path']) : '') ?></pre>
-        <?php else: ?>
-        <pre style="white-space:pre-wrap"><?= e(file_exists($mainContent['path']) ? file_get_contents($mainContent['path']) : '') ?></pre>
-        <?php endif; ?>
+    <!-- Text / HTML / Markdown content -->
+    <div class="text-content prose">
+        <?= $renderedContent ?>
     </div>
     <?php endif; ?>
 
     <!-- Image gallery -->
-    <?php if (!empty($images) && ($config['show_image_gallery'] ?? true)): ?>
+    <?php if (!empty($images) && ($lessonConfig['show_image_gallery'] ?? true)): ?>
     <div class="image-gallery">
         <?php foreach ($images as $img): ?>
-        <img src="<?= e($img['path']) ?>" alt="<?= e($img['filename']) ?>" loading="lazy" />
+        <img src="<?= e($mediaUrl($img)) ?>" alt="<?= e($img['filename']) ?>" loading="lazy" />
         <?php endforeach; ?>
     </div>
     <?php endif; ?>
 
     <!-- Attachments panel -->
-    <?php if (!empty($attachments) && ($config['show_attachments'] ?? true)):
-        $attIcon = function(string $filename): string {
-            $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-            return match($ext) {
-                'pdf'         => 'fa-file-pdf',
-                'docx', 'doc' => 'fa-file-word',
-                'zip', 'rar'  => 'fa-file-zipper',
-                'xlsx'        => 'fa-file-excel',
-                'pptx'        => 'fa-file-powerpoint',
-                default       => 'fa-file',
-            };
-        };
-    ?>
+    <?php if (!empty($attachments) && ($lessonConfig['show_attachments'] ?? true)): ?>
     <div class="attachments-panel">
         <h4><i class="fa-solid fa-paperclip"></i> <?= e(t('course.sources')) ?></h4>
         <ul class="attachment-list">
             <?php foreach ($attachments as $att): ?>
             <li>
-                <a href="<?= e($att['path']) ?>" download>
+                <a href="<?= e($mediaUrl($att)) ?>" download>
                     <i class="fa-solid <?= $attIcon($att['filename']) ?>"></i>
                     <?= e($att['filename']) ?>
                 </a>
@@ -155,13 +149,16 @@ $layout = $config['layout'] ?? 'default';
 
 <script>
 (function () {
-    const lessonId = <?= (int)$lesson['id'] ?>;
+    const lessonId     = <?= (int)$lesson['id'] ?>;
+    const courseSlug   = <?= json_encode($course['slug']) ?>;
+    const pendingLabel = <?= json_encode(t('comment.pending')) ?>;
+    const replyLabel   = <?= json_encode(t('comment.reply')) ?>;
+    const errorLabel   = <?= json_encode(t('general.error')) ?>;
 
     // --- Progress: mark complete button ---
     const btnComplete = document.getElementById('btn-complete');
     if (btnComplete) {
-        // Load current progress state
-        fetch('/api/progress/<?= e($course['slug']) ?>', { credentials: 'same-origin' })
+        fetch('/api/progress/' + courseSlug, { credentials: 'same-origin' })
             .then(r => r.json())
             .then(data => {
                 if (data[lessonId] && data[lessonId].completed) {
@@ -177,21 +174,62 @@ $layout = $config['layout'] ?? 'default';
                 method: 'POST',
                 credentials: 'same-origin',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ lessonId: lessonId, completed: true })
+                body: JSON.stringify({ lessonId, completed: true })
             })
             .then(r => r.json())
             .then(() => {
                 btnComplete.textContent = '✓ Completed';
                 btnComplete.style.background = '#4caf50';
-                if (nextUrl) {
-                    setTimeout(() => { window.location.href = nextUrl; }, 600);
-                }
+                if (nextUrl) setTimeout(() => { window.location.href = nextUrl; }, 600);
             })
             .catch(() => {});
         });
     }
 
     // --- Comments ---
+    let activeReplyParentId = null;
+
+    function escHtml(s) {
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function commentHtml(c, isReply) {
+        const badge = c.pending
+            ? `<span style="font-size:0.72rem;background:#fff3cd;color:#856404;padding:1px 6px;border-radius:4px;margin-left:6px">${escHtml(pendingLabel)}</span>`
+            : '';
+        const date   = new Date(c.createdAt * 1000).toLocaleDateString();
+        const replyBtn = !isReply && !c.pending
+            ? `<button class="reply-btn" data-id="${c.id}"
+                 style="background:none;border:none;cursor:pointer;font-size:0.8rem;color:var(--color-accent);padding:0;margin-top:0.3rem">
+                 <i class="fa-solid fa-reply"></i> ${escHtml(replyLabel)}
+               </button>`
+            : '';
+        return `
+        <div class="comment-item" data-comment-id="${c.id}"
+             style="border-bottom:1px solid rgba(0,0,0,0.07);padding:0.75rem 0">
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem">
+                <strong style="font-size:0.875rem">${escHtml(c.userName)}</strong>
+                <span style="font-size:0.75rem;color:var(--color-text-muted)">${date}</span>
+                ${badge}
+            </div>
+            <p style="font-size:0.9rem;margin:0 0 0.25rem;line-height:1.5">${escHtml(c.body)}</p>
+            ${replyBtn}
+            <div class="inline-reply-form" style="display:none;margin-top:0.5rem"></div>
+        </div>`;
+    }
+
+    function buildInlineReplyForm(parentId) {
+        return `
+        <form class="reply-submit-form" data-parent-id="${parentId}" style="display:flex;gap:0.5rem;align-items:flex-start">
+            <textarea rows="2" placeholder="${escHtml(pendingLabel)}…"
+                      style="flex:1;padding:0.4rem;border:1px solid #ccc;border-radius:5px;font-size:0.85rem;resize:vertical;font-family:inherit"></textarea>
+            <button type="submit"
+                    style="padding:0.4rem 0.9rem;background:var(--color-accent);color:#fff;border:none;border-radius:5px;cursor:pointer;font-size:0.85rem;white-space:nowrap">
+                ${escHtml(replyLabel)}
+            </button>
+        </form>`;
+    }
+
     function renderComments(comments) {
         const list = document.getElementById('comments-list');
         if (!list) return;
@@ -200,7 +238,6 @@ $layout = $config['layout'] ?? 'default';
             return;
         }
 
-        // Separate top-level and replies
         const topLevel = comments.filter(c => !c.parentId);
         const replies  = comments.filter(c => c.parentId);
 
@@ -209,65 +246,79 @@ $layout = $config['layout'] ?? 'default';
                 .filter(r => r.parentId === c.id)
                 .map(r => commentHtml(r, true))
                 .join('');
-            return commentHtml(c, false) + (childHtml ? '<div style="margin-left:2rem">' + childHtml + '</div>' : '');
+            return commentHtml(c, false) +
+                (childHtml ? `<div style="margin-left:2rem">${childHtml}</div>` : '');
         }).join('');
-    }
 
-    function commentHtml(c, isReply) {
-        const pendingBadge = c.pending
-            ? '<span style="font-size:0.72rem;background:#fff3cd;color:#856404;padding:1px 6px;border-radius:4px;margin-left:6px"><?= e(t('comment.pending')) ?></span>'
-            : '';
-        const date = new Date(c.createdAt * 1000).toLocaleDateString();
-        return `
-        <div style="border-bottom:1px solid rgba(0,0,0,0.07);padding:0.75rem 0${isReply ? ';opacity:0.85' : ''}">
-            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem">
-                <strong style="font-size:0.875rem">${c.userName}</strong>
-                <span style="font-size:0.75rem;color:var(--color-text-muted)">${date}</span>
-                ${pendingBadge}
-            </div>
-            <p style="font-size:0.9rem;margin:0;line-height:1.5">${escHtml(c.body)}</p>
-        </div>`;
-    }
+        // Wire reply buttons
+        list.querySelectorAll('.reply-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const parentId    = parseInt(btn.dataset.id);
+                const commentItem = btn.closest('.comment-item');
+                const replyDiv    = commentItem.querySelector('.inline-reply-form');
 
-    function escHtml(s) {
-        return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    }
+                // Close any other open reply forms
+                list.querySelectorAll('.inline-reply-form').forEach(d => {
+                    if (d !== replyDiv) d.style.display = 'none';
+                });
 
-    // Load comments
-    fetch('/api/comments/' + lessonId, { credentials: 'same-origin' })
-        .then(r => r.json())
-        .then(renderComments)
-        .catch(() => {
-            const list = document.getElementById('comments-list');
-            if (list) list.innerHTML = '<p style="color:var(--color-text-muted)"><?= e(t('general.error')) ?></p>';
+                if (replyDiv.style.display === 'none') {
+                    replyDiv.innerHTML  = buildInlineReplyForm(parentId);
+                    replyDiv.style.display = 'block';
+                    replyDiv.querySelector('textarea').focus();
+
+                    replyDiv.querySelector('.reply-submit-form').addEventListener('submit', ev => {
+                        ev.preventDefault();
+                        const text = replyDiv.querySelector('textarea').value.trim();
+                        if (!text) return;
+                        postComment(text, parentId, () => { replyDiv.style.display = 'none'; });
+                    });
+                } else {
+                    replyDiv.style.display = 'none';
+                }
+            });
         });
+    }
 
-    // Post comment
+    function loadComments() {
+        fetch('/api/comments/' + lessonId, { credentials: 'same-origin' })
+            .then(r => r.json())
+            .then(renderComments)
+            .catch(() => {
+                const list = document.getElementById('comments-list');
+                if (list) list.innerHTML = `<p style="color:var(--color-text-muted)">${escHtml(errorLabel)}</p>`;
+            });
+    }
+
+    function postComment(text, parentId, onSuccess) {
+        fetch('/api/comments', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ lessonId, body: text, parentId: parentId || null })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) {
+                if (onSuccess) onSuccess();
+                loadComments();
+            }
+        })
+        .catch(() => {});
+    }
+
+    loadComments();
+
+    // Top-level post form
     const form = document.getElementById('comment-form');
     if (form) {
-        form.addEventListener('submit', e => {
-            e.preventDefault();
+        form.addEventListener('submit', ev => {
+            ev.preventDefault();
             const body = document.getElementById('comment-body').value.trim();
             if (!body) return;
-
-            fetch('/api/comments', {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ lessonId: lessonId, body: body })
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.ok) {
-                    document.getElementById('comment-body').value = '';
-                    // Reload comments to include the new pending one
-                    fetch('/api/comments/' + lessonId, { credentials: 'same-origin' })
-                        .then(r => r.json())
-                        .then(renderComments)
-                        .catch(() => {});
-                }
-            })
-            .catch(() => {});
+            postComment(body, null, () => {
+                document.getElementById('comment-body').value = '';
+            });
         });
     }
 

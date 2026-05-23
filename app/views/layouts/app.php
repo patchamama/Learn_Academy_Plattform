@@ -45,6 +45,18 @@
                     <span>Admin</span>
                 </a>
             </li>
+            <li>
+                <a class="menu-option<?= str_starts_with($_SERVER['REQUEST_URI'], '/admin/courses') ? ' active' : '' ?>" href="/admin/courses">
+                    <i class="fa-solid fa-chalkboard icon"></i>
+                    <span><?= e(t('admin.courses')) ?></span>
+                </a>
+            </li>
+            <li>
+                <a class="menu-option<?= str_starts_with($_SERVER['REQUEST_URI'], '/admin/editor') ? ' active' : '' ?>" href="/admin/editor">
+                    <i class="fa-solid fa-pen-ruler icon"></i>
+                    <span>Editor</span>
+                </a>
+            </li>
             <?php endif; ?>
             <?php if (isset($auth) && $auth->isLoggedIn()): ?>
             <li>

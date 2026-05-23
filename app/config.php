@@ -27,6 +27,7 @@ return [
     'default_locale'     => 'en',
     'supported_locales'  => ['en', 'es'],
 
+    'course_price_cents' => 2900,
     'course_access_days' => 365,
 
     'admin_email'        => '',

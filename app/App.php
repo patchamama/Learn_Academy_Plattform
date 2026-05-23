@@ -186,6 +186,41 @@ class App
             (new Controllers\AdminController($app))->deleteCourse((int)$p['id'])
         );
 
+        // ── Editor ───────────────────────────────────────────────────────────────
+        $this->router->get('/admin/editor', fn() =>
+            (new Controllers\EditorController($app))->index()
+        );
+        $this->router->get('/admin/editor/:courseId', fn($p) =>
+            (new Controllers\EditorController($app))->course((int)$p['courseId'])
+        );
+        $this->router->post('/admin/editor/:courseId/lesson/:lessonId', fn($p) =>
+            (new Controllers\EditorController($app))->saveLesson((int)$p['courseId'], (int)$p['lessonId'])
+        );
+        $this->router->post('/admin/editor/:courseId/lesson/:lessonId/upload', fn($p) =>
+            (new Controllers\EditorController($app))->uploadFile((int)$p['courseId'], (int)$p['lessonId'])
+        );
+        $this->router->post('/admin/editor/:courseId/file/:fileId/delete', fn($p) =>
+            (new Controllers\EditorController($app))->deleteFile((int)$p['courseId'], (int)$p['fileId'])
+        );
+        $this->router->post('/admin/editor/:courseId/section', fn($p) =>
+            (new Controllers\EditorController($app))->addSection((int)$p['courseId'])
+        );
+        $this->router->post('/admin/editor/:courseId/section/:sectionId/delete', fn($p) =>
+            (new Controllers\EditorController($app))->deleteSection((int)$p['courseId'], (int)$p['sectionId'])
+        );
+        $this->router->post('/admin/editor/:courseId/section/:sectionId/lesson', fn($p) =>
+            (new Controllers\EditorController($app))->addLesson((int)$p['courseId'], (int)$p['sectionId'])
+        );
+        $this->router->post('/admin/editor/:courseId/lesson/:lessonId/delete', fn($p) =>
+            (new Controllers\EditorController($app))->deleteLesson((int)$p['courseId'], (int)$p['lessonId'])
+        );
+        $this->router->post('/admin/editor/:courseId/reorder', fn($p) =>
+            (new Controllers\EditorController($app))->reorder((int)$p['courseId'])
+        );
+        $this->router->post('/admin/editor/:courseId/reimport', fn($p) =>
+            (new Controllers\EditorController($app))->reimport((int)$p['courseId'])
+        );
+
         // ── Payments ─────────────────────────────────────────────────────
         $this->router->get('/purchase/:courseSlug', fn($p) =>
             (new Controllers\PaymentController($app))->checkout($p['courseSlug'])
