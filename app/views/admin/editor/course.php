@@ -608,13 +608,19 @@ function attachDragHandlers() {
         el.addEventListener('drop', e => {
             if (dragType !== 'lesson' || dragSrc === el) return;
             e.preventDefault();
-            const container = el.closest('.section-lessons');
+            const container    = el.closest('.section-lessons');
             const srcContainer = dragSrc.closest('.section-lessons');
-            if (container !== srcContainer) return; // only reorder within same section
-            const els  = [...container.querySelectorAll(':scope > .lesson-row')];
-            const srcI = els.indexOf(dragSrc);
-            const dstI = els.indexOf(el);
-            if (srcI < dstI) el.after(dragSrc); else el.before(dragSrc);
+
+            if (container !== srcContainer) {
+                // Cross-section move: insert before target in new section
+                el.before(dragSrc);
+                dragSrc.dataset.sectionId = container.dataset.sectionId;
+            } else {
+                const els  = [...container.querySelectorAll(':scope > .lesson-row')];
+                const srcI = els.indexOf(dragSrc);
+                const dstI = els.indexOf(el);
+                if (srcI < dstI) el.after(dragSrc); else el.before(dragSrc);
+            }
         });
     });
 }
@@ -627,8 +633,9 @@ function saveReorder() {
 
     const lessons = [];
     document.querySelectorAll('.section-lessons').forEach(container => {
+        const sectionId = parseInt(container.dataset.sectionId);
         container.querySelectorAll(':scope > .lesson-row').forEach((el, idx) => {
-            lessons.push({ id: parseInt(el.dataset.lessonId), order: idx });
+            lessons.push({ id: parseInt(el.dataset.lessonId), order: idx, sectionId });
         });
     });
 

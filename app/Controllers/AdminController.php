@@ -37,7 +37,18 @@ class AdminController
         $this->app->auth->requireAdmin();
         $db = $this->app->db;
 
-        $users   = $db->fetchAll('SELECT id, name, email, role, locale, created_at FROM users ORDER BY created_at DESC');
+        $perPage = 25;
+        $page    = max(1, (int)($_GET['page'] ?? 1));
+        $offset  = ($page - 1) * $perPage;
+
+        $totalRow = $db->fetchOne('SELECT COUNT(*) AS cnt FROM users');
+        $total    = (int)($totalRow['cnt'] ?? 0);
+        $pages    = (int)ceil($total / $perPage);
+
+        $users   = $db->fetchAll(
+            'SELECT id, name, email, role, locale, created_at FROM users ORDER BY created_at DESC LIMIT ? OFFSET ?',
+            [$perPage, $offset]
+        );
         $courses = $db->fetchAll('SELECT id, slug, title FROM courses ORDER BY title');
 
         $now = time();
@@ -54,6 +65,9 @@ class AdminController
             'users'   => $users,
             'courses' => $courses,
             'csrf'    => $this->app->auth->csrfToken(),
+            'page'    => $page,
+            'pages'   => $pages,
+            'total'   => $total,
         ]);
     }
 

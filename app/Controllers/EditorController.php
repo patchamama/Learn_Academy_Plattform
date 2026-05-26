@@ -413,7 +413,13 @@ class EditorController
 
         if (!empty($data['lessons']) && is_array($data['lessons'])) {
             foreach ($data['lessons'] as $item) {
-                if (isset($item['id'], $item['order'])) {
+                if (!isset($item['id'], $item['order'])) continue;
+                if (isset($item['sectionId'])) {
+                    $db->execute(
+                        'UPDATE lessons SET sort_order = ?, section_id = ? WHERE id = ?',
+                        [(int)$item['order'], (int)$item['sectionId'], (int)$item['id']]
+                    );
+                } else {
                     $db->execute(
                         'UPDATE lessons SET sort_order = ? WHERE id = ?',
                         [(int)$item['order'], (int)$item['id']]

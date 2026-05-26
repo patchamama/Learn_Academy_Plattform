@@ -2,8 +2,12 @@
 /** @var array  $users */
 /** @var array  $courses */
 /** @var string $csrf */
+/** @var int    $page */
+/** @var int    $pages */
+/** @var int    $total */
 ?>
-<h2 style="margin-bottom:1.5rem"><?= e(t('admin.users')) ?></h2>
+<h2 style="margin-bottom:0.25rem"><?= e(t('admin.users')) ?></h2>
+<p style="color:var(--color-text-muted);font-size:0.85rem;margin-bottom:1.5rem"><?= (int)$total ?> users total</p>
 
 <table style="width:100%;border-collapse:collapse;font-size:0.875rem;background:var(--color-bg-card, #fff);border-radius:8px;overflow:hidden">
     <thead>
@@ -57,3 +61,34 @@
         <?php endforeach; ?>
     </tbody>
 </table>
+
+<?php if ($pages > 1): ?>
+<nav style="display:flex;gap:0.4rem;align-items:center;margin-top:1.25rem;flex-wrap:wrap">
+    <?php if ($page > 1): ?>
+    <a href="?page=<?= $page - 1 ?>"
+       style="padding:0.35rem 0.75rem;border:1px solid #ccc;border-radius:5px;font-size:0.85rem;text-decoration:none;color:var(--color-accent)">
+        &laquo; Prev
+    </a>
+    <?php endif; ?>
+
+    <?php for ($i = max(1, $page - 2); $i <= min($pages, $page + 2); $i++): ?>
+    <a href="?page=<?= $i ?>"
+       style="padding:0.35rem 0.75rem;border:1px solid <?= $i === $page ? 'var(--color-accent)' : '#ccc' ?>;border-radius:5px;font-size:0.85rem;text-decoration:none;
+              background:<?= $i === $page ? 'var(--color-accent)' : 'transparent' ?>;
+              color:<?= $i === $page ? '#fff' : 'var(--color-accent)' ?>">
+        <?= $i ?>
+    </a>
+    <?php endfor; ?>
+
+    <?php if ($page < $pages): ?>
+    <a href="?page=<?= $page + 1 ?>"
+       style="padding:0.35rem 0.75rem;border:1px solid #ccc;border-radius:5px;font-size:0.85rem;text-decoration:none;color:var(--color-accent)">
+        Next &raquo;
+    </a>
+    <?php endif; ?>
+
+    <span style="font-size:0.8rem;color:var(--color-text-muted);margin-left:0.5rem">
+        Page <?= $page ?> of <?= $pages ?>
+    </span>
+</nav>
+<?php endif; ?>
